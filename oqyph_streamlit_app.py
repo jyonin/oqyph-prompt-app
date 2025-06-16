@@ -3,50 +3,34 @@ import random
 
 st.title("OQYPH Prompt Generator")
 
-odd_adjs = ["eyeless", "melted", "synthetic", "deformed", "mirrored", "fragmented"]
-freak_targets = ["rabbit", "doll", "mannequin", "virgin mary", "statue", "angel"]
-textures = ["jelly", "plastic doll", "stone", "fur toy", "liquid", "vegetable", "flower"]
+# 키워드 풀
+odd_adjs = ["eyeless", "melted", "synthetic", "deformed", "fragmented", "asymmetrical", "distorted", "hollow", "cracked", "stretched", "burned", "fossilized", "corroded", "scorched", "grotesque"]
+odd_targets = ["doll", "rabbit", "mannequin", "virgin mary", "statue", "cat", "unicorn", "angel", "toy", "saint bust", "skull", "thorn crown", "broken mirror"]
 
-generated_scenario = ""
+queer_adjs = ["ambiguous", "fluid", "androgynous", "twisted", "inverted", "mirrored", "hybrid", "reversed", "split", "reflected"]
+queer_targets = ["angel", "cherub", "idol", "mask", "mirror figure", "dual-faced statue", "serpent", "myth creature", "chimera"]
 
-if st.button("🎲 Generate Random OQYPH Scenario / 랜덤 오키프 시나리오 생성"):
-    adj_sample = random.sample(odd_adjs, 3)
-    target_sample = random.sample(freak_targets, 3)
-    texture_sample = random.choice(textures)
-    
-    generated_scenario = f"{', '.join(adj_sample)} {', '.join(target_sample)}, {texture_sample} texture"
-    st.text_area("Generated Scenario / 생성된 시나리오", generated_scenario, height=100)
+freak_adjs = ["stitched", "mutated", "monstrous", "hybrid", "dismembered", "grotesque", "twisted", "scarred", "overgrown", "fused"]
+freak_targets = ["creature", "insect-human hybrid", "chimera", "stitched animal", "mutant doll", "beast", "limb pile", "eyeball cluster"]
 
-# Main inputs
-st.markdown("---")
-object_desc = st.text_input("Object Description / 대상 설명", generated_scenario if generated_scenario else "")
-pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
-background = st.text_input("Background Content / 배경 내용", "red background, church ruins")
+textures = ["jelly", "plastic doll", "stone", "fur toy", "liquid", "vegetable", "flower", "bone", "rusted metal", "wax"]
 
-framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
-angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
-film = st.text_input("Film / lens / lighting / effects", "1970s 1980s film style, 16mm, vintage lens, soft flash")
+# 랜덤 생성
+if st.button("🎲 Generate Random OQYPH Scenario"):
+    adjs = random.sample(odd_adjs, 1) + random.sample(queer_adjs, 1) + random.sample(freak_adjs, 1)
+    targets = random.sample(odd_targets, 1) + random.sample(queer_targets, 1) + random.sample(freak_targets, 1)
+    texture = random.choice(textures)
 
-if st.button("✨ Generate Prompt"):
-    parts = f"{object_desc}, {pose_desc}, {background}, {angle}, {film}"
-    words = [w.strip() for w in parts.split(",")]
+    scenario = f"{', '.join(adjs)} {', '.join(targets)}, {texture} texture"
+    st.text_area("Generated Scenario / 생성된 시나리오", scenario, height=100)
 
-    seen = set()
-    cleaned = []
-    removed = []
-    for w in words:
-        if w not in seen:
-            cleaned.append(w)
-            seen.add(w)
-        else:
-            removed.append(w)
+    # 추가 정보
+    pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
+    background = st.text_input("Background Content / 배경 내용", "red background, church ruins")
+    framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
+    angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
+    film = st.text_input("Film / lens / lighting / effects", "1970s 1980s film style, 16mm, vintage lens, soft flash")
 
-    ar_code = f"--ar {framing}" if framing else ""
-    final_prompt = ", ".join(cleaned) + f" {ar_code}"
-    st.text_area("🎬 Generated Prompt / 생성된 프롬프트", final_prompt, height=150)
-
-    if removed:
-        st.markdown("#### Removed duplicate elements / 제거된 중복 요소")
-        st.write(", ".join(removed))
-    else:
-        st.markdown("✅ No duplicates found / 중복 요소 없음")
+    if st.button("✨ Generate Prompt"):
+        prompt = f"{scenario}, {pose_desc}, {background}, {angle}, {film} --ar {framing}"
+        st.text_area("🎬 Generated Prompt / 생성된 프롬프트", prompt, height=150)
