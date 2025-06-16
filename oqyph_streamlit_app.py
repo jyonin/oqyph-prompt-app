@@ -13,12 +13,24 @@ queer_targets = ["angel", "cherub", "idol", "mask", "mirror figure", "dual-faced
 freak_adjs = ["stitched", "mutated", "monstrous", "hybrid", "dismembered", "grotesque", "twisted", "scarred", "overgrown", "fused"]
 freak_targets = ["creature", "insect-human hybrid", "chimera", "stitched animal", "mutant doll", "beast", "limb pile", "eyeball cluster"]
 
-textures = ["jelly", "plastic doll", "stone", "fur toy", "liquid", "vegetable", "flower", "bone", "rusted metal", "wax"]
+background_options = [
+    "red", "black", "green", "blue", "yellow", "orange", 
+    "navy", "purple", "white", "gray", "rainbow gradient", 
+    "background filled with jewels", 
+    "velvet cloth in complementary color to object", 
+    "white (isolated / no background)"
+]
+
+distance_options = [
+    "extreme close-up", "close-up", "bust shot", 
+    "half-body shot", "full-body shot", "long shot", "extreme long shot"
+]
 
 # 카테고리 선택
 adj_category = st.selectbox("Select adjective category / 형용사 카테고리", ["Odd", "Queer", "Freak"])
 target_category = st.selectbox("Select target category / 대상 카테고리", ["Odd", "Queer", "Freak"])
-texture_choice = st.selectbox("Select texture / 텍스처 선택", textures)
+background_color = st.selectbox("Select background / 배경 선택", background_options)
+subject_distance = st.selectbox("Select subject distance / 피사체 거리", distance_options)
 
 # 랜덤 요소 생성
 if st.button("🎲 Generate Random Scenario"):
@@ -36,7 +48,7 @@ if st.button("🎲 Generate Random Scenario"):
     else:
         target = random.choice(freak_targets)
 
-    scenario = f"{adj} {target}, {texture_choice} texture"
+    scenario = f"{adj} {target}"
     st.session_state["scenario"] = scenario
 
 # 시나리오 출력 유지
@@ -45,7 +57,6 @@ st.text_area("Generated Scenario / 생성된 시나리오", scenario_display, he
 
 # 추가 요소
 pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
-background = st.text_input("Background Content / 배경 내용", "red background, church ruins")
 framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
 angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
 film = st.text_input("Film / lens / lighting / effects", "1970s 1980s film style, 16mm, vintage lens, soft flash")
@@ -53,7 +64,7 @@ film = st.text_input("Film / lens / lighting / effects", "1970s 1980s film style
 # 프롬프트 생성
 if st.button("✨ Generate Prompt"):
     if scenario_display:
-        prompt = f"{scenario_display}, {pose_desc}, {background}, {angle}, {film} --ar {framing}"
+        prompt = f"{scenario_display}, {pose_desc}, {background_color} background, {subject_distance}, {angle}, {film} --ar {framing}"
         st.text_area("🎬 Generated Prompt / 생성된 프롬프트", prompt, height=150)
     else:
         st.warning("Please generate a scenario first!")
