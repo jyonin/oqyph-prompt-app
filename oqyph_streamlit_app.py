@@ -26,7 +26,8 @@ distance_options = [
     "half-body shot", "full-body shot", "long shot", "extreme long shot"
 ]
 
-lens_options = [
+# 렌즈 선택 (표시용 + 프롬프트용 분리)
+lens_options_display = [
     "16mm 광각 렌즈 (왜곡 강함, 공간감 강조)",
     "35mm 다큐 렌즈 (자연스러운 광각)",
     "50mm 표준 렌즈 (사람 눈과 비슷)",
@@ -34,6 +35,15 @@ lens_options = [
     "200mm 망원 렌즈 (원근감 약화, 압축)",
     "fish-eye 렌즈 (극단적 왜곡, 초광각)",
     "macro 렌즈 (초근접 디테일 강조)"
+]
+lens_options_clean = [
+    "16mm lens",
+    "35mm lens",
+    "50mm lens",
+    "85mm lens",
+    "200mm lens",
+    "fish-eye lens",
+    "macro lens"
 ]
 
 # 카테고리 선택
@@ -66,7 +76,8 @@ st.text_area("Generated Scenario / 생성된 시나리오", scenario_display, he
 # 추가 입력
 background_color = st.selectbox("Select background / 배경 선택", background_options)
 subject_distance = st.selectbox("Select subject distance / 피사체 거리", distance_options)
-lens_choice = st.selectbox("Select lens type / 렌즈 종류", lens_options)
+lens_idx = st.selectbox("Select lens type / 렌즈 종류", lens_options_display, index=0)
+lens_clean = lens_options_clean[lens_options_display.index(lens_idx)]
 pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
 framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
 angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
@@ -74,7 +85,7 @@ angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side vie
 # 프롬프트 생성
 if st.button("✨ Generate Prompt"):
     if scenario_display:
-        lens_film = f"{lens_choice}, 1970s 1980s vintage film style"
+        lens_film = f"{lens_clean}, 1970s 1980s vintage film style"
         prompt = (
             f"{scenario_display}, {pose_desc}, {background_color} background, "
             f"{subject_distance}, {angle}, {lens_film} --ar {framing}"
