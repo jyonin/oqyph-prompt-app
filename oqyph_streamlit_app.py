@@ -3,7 +3,7 @@ import random
 
 st.title("OQYPH Prompt Generator")
 
-# 키워드 풀
+# 풀 데이터
 odd_adjs = ["eyeless", "melted", "synthetic", "deformed", "fragmented", "asymmetrical", "distorted", "hollow", "cracked", "stretched", "burned", "fossilized", "corroded", "scorched", "grotesque"]
 odd_targets = ["doll", "rabbit", "mannequin", "virgin mary", "statue", "cat", "unicorn", "angel", "toy", "saint bust", "skull", "thorn crown", "broken mirror"]
 
@@ -15,16 +15,34 @@ freak_targets = ["creature", "insect-human hybrid", "chimera", "stitched animal"
 
 textures = ["jelly", "plastic doll", "stone", "fur toy", "liquid", "vegetable", "flower", "bone", "rusted metal", "wax"]
 
-# 랜덤 생성
-if st.button("🎲 Generate Random OQYPH Scenario"):
-    adjs = random.sample(odd_adjs, 1) + random.sample(queer_adjs, 1) + random.sample(freak_adjs, 1)
-    targets = random.sample(odd_targets, 1) + random.sample(queer_targets, 1) + random.sample(freak_targets, 1)
+# 유저 선택
+adj_category = st.selectbox("Select adjective category / 형용사 카테고리", ["Odd", "Queer", "Freak"])
+target_category = st.selectbox("Select target category / 대상 카테고리", ["Odd", "Queer", "Freak"])
+
+if st.button("🎲 Generate Random Elements"):
+    # 형용사 랜덤
+    if adj_category == "Odd":
+        adj = random.choice(odd_adjs)
+    elif adj_category == "Queer":
+        adj = random.choice(queer_adjs)
+    else:
+        adj = random.choice(freak_adjs)
+
+    # 대상 랜덤
+    if target_category == "Odd":
+        target = random.choice(odd_targets)
+    elif target_category == "Queer":
+        target = random.choice(queer_targets)
+    else:
+        target = random.choice(freak_targets)
+
+    # 텍스처 랜덤
     texture = random.choice(textures)
 
-    scenario = f"{', '.join(adjs)} {', '.join(targets)}, {texture} texture"
+    scenario = f"{adj} {target}, {texture} texture"
     st.text_area("Generated Scenario / 생성된 시나리오", scenario, height=100)
 
-    # 추가 정보
+    # 추가 입력
     pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
     background = st.text_input("Background Content / 배경 내용", "red background, church ruins")
     framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
