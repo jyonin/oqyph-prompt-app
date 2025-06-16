@@ -1,78 +1,97 @@
 import streamlit as st
+import random
 
 st.title("OQYPH Prompt Generator")
 
-# Inner elements
-st.markdown("## 🧍 Inner Elements (Pose / Scene / Background)")
+# 랜덤 시나리오 키워드 데이터
+scenario_dict = {
+    ("Odd", "Sacred"): [
+        "eyeless virgin mary, black tears, plastic texture",
+        "headless saint statue, melted surface, hollow eyes"
+    ],
+    ("Queer", "Myth"): [
+        "synthetic unicorn, broken horn, metallic reflection",
+        "androgynous angel, fragmented wings, neon halo"
+    ],
+    ("Freak", "Clinical"): [
+        "stitched skin figure, anatomy tubes, translucent body",
+        "asymmetrical face, medical mask, glass eyes"
+    ],
+    ("Odd", "Soft"): [
+        "jelly-like cat, liquid eyes, rubbery texture",
+        "plush rabbit, melted ear, soft glow"
+    ],
+    ("Narcissism", "Queer"): [
+        "mirrored face mask, endless reflections, cracked surface",
+        "fragmented body, chrome shine, double faces"
+    ],
+    # 추가 키워드 조합
+    ("Freak", "Myth"): [
+        "hybrid insect-human, ancient symbol tattoo, iridescent wings"
+    ],
+    ("Odd", "Clinical"): [
+        "deformed doll, plastic tubes, hospital bed"
+    ]
+}
 
-# Overall pose: 선택 + 자유 입력
-overall_pose_select = st.selectbox("Overall Pose (Select)", ["", "standing", "sitting", "crouching", "jumping", "lying down"])
-overall_pose_custom = st.text_input("Overall Pose (Custom, optional)", "")
+# 랜덤 시나리오 UI
+st.markdown("## 🎲 OQYPH Random Scenario Generator / 랜덤 오키프 시나리오 생성기")
+colA, colB = st.columns(2)
+keyword1 = colA.selectbox("Visual Keyword 1 / 시각 키워드 1", ["", "Odd", "Freak", "Queer", "Sacred", "Clinical", "Myth", "Soft", "Narcissism"])
+keyword2 = colB.selectbox("Visual Keyword 2 / 시각 키워드 2", ["", "Odd", "Freak", "Queer", "Sacred", "Clinical", "Myth", "Soft", "Narcissism"])
 
-part_gesture = st.text_input("Part Gestures", "arm raised, head tilted")
-direction = st.text_input("Direction", "facing left")
-expression = st.text_input("Expression", "neutral")
-action = st.text_input("Action / Scene Interaction", "reaching toward light")
-background_content = st.text_input("Background Content", "red background, church ruins")
+generated_scenario = ""
+if st.button("🎲 Generate Random Scenario / 랜덤 시나리오 생성"):
+    key_pair = (keyword1, keyword2)
+    alt_pair = (keyword2, keyword1)
+    candidates = scenario_dict.get(key_pair) or scenario_dict.get(alt_pair)
+    if candidates:
+        generated_scenario = random.choice(candidates)
+        st.success("Scenario generated!")
+    else:
+        generated_scenario = "No scenario found for this combination."
+    st.text_area("Generated OQYPH Scenario / 생성된 비주얼 시나리오", generated_scenario, height=100)
 
-object_desc = st.text_input("Object Description", 
-                            "a black teddy bear with three eyes and green jelly cut surface")
+# 메인 컬럼
+col1, col2 = st.columns(2)
 
-st.markdown("---")
+with col1:
+    st.markdown("### 🧍 Inner Elements / 내부 요소")
+    object_desc = st.text_input("Object Description / 대상 설명", generated_scenario if generated_scenario else "")
+    pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
+    background = st.text_input("Background Content / 배경 내용", "red background, church ruins")
 
-# Outer elements
-st.markdown("## 🎥 Outer Elements (Camera / Film / Mood)")
+with col2:
+    st.markdown("### 🎥 Outer Elements / 외부 요소")
+    framing = st.text_input("Framing (size + aspect ratio) / 프레이밍", "close-up, 2:3")
+    angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
+    film = st.text_input("Film / lens / lighting / effects / 필름, 렌즈, 조명, 효과", 
+                         "1970s 1980s film style, 16mm, vintage lens, soft flash")
 
-# Frame size = 화면 비율
-frame_ratio = st.selectbox("Frame Aspect Ratio", ["", "1:1", "2:3", "16:9"])
-
-# Subject size
-subject_size = st.selectbox("Subject Size", [
-    "", 
-    "extreme close-up", 
-    "close-up", 
-    "bust shot", 
-    "half-body shot", 
-    "full-body shot", 
-    "wide shot", 
-    "extreme wide shot"
-])
-
-angle = st.selectbox("Camera Angle", ["front view", "side view", "top view", "back view"])
-film_format = st.selectbox("Film Format", ["16mm", "35mm", "VHS"])
-lens_type = st.selectbox("Lens Type", ["1970s 1980s vintage lens", "fish-eye lens", "macro lens"])
-light_type = st.selectbox("Lighting", ["soft flash", "harsh spotlight", "low key light"])
-color_tone = st.text_input("Color Tone", "muted bruised pink and moldy mint")
-
-grain = "high grain"
-extra_tone = "soft flash, stage-like composition"
-
-depth_effect = st.selectbox("Depth Effect", ["", "depth of field", "bokeh background"])
-color_temperature = st.selectbox("Color Temperature / Filter", ["", "warm tone", "cold tone"])
-
+# Generate button
 if st.button("✨ Generate Prompt"):
-    # Build inner
-    poses = [overall_pose_select, overall_pose_custom.strip()]
-    pose_combined = ", ".join([p for p in poses if p])
-    
-    inner_elements = [pose_combined, part_gesture.strip(), direction.strip(), expression.strip(), action.strip(), background_content.strip()]
-    inner_filtered = [el for el in inner_elements if el]
-    inner_description = ", ".join(inner_filtered)
-    
-    # Build outer
-    outer_elements = [frame_ratio, subject_size, angle, film_format, lens_type, depth_effect, color_temperature]
-    outer_filtered = [el for el in outer_elements if el]
-    outer_description = ", ".join(outer_filtered)
-    
-    visual_tone = f"1970s 1980s film style, handmade props, real texture, {grain}, {color_tone}, {extra_tone}, {light_type}"
-    
-    prompt_parts = [object_desc]
-    if inner_description:
-        prompt_parts.append(inner_description)
-    if outer_description:
-        prompt_parts.append(outer_description)
-    prompt_parts.append(visual_tone + f" --ar {frame_ratio if frame_ratio else '2:3'}")
-    
-    prompt = ", ".join(prompt_parts)
-    
-    st.text_area("🎬 Generated Prompt", prompt, height=150)
+    parts = f"{object_desc}, {pose_desc}, {background}, {framing}, {angle}, {film}"
+    words = [w.strip() for w in parts.split(",")]
+
+    seen = set()
+    cleaned = []
+    removed = []
+    for w in words:
+        if w not in seen:
+            cleaned.append(w)
+            seen.add(w)
+        else:
+            removed.append(w)
+
+    final_prompt = ", ".join(cleaned)
+    st.text_area("🎬 Generated Prompt / 생성된 프롬프트", final_prompt, height=150)
+
+    # 복사 버튼 (Streamlit 환경에서는 JS나 클립보드 직접 접근 어려워 안내 제공)
+    st.button("📋 Copy Prompt / 프롬프트 복사 (please copy manually)")
+
+    # Removed duplicates
+    if removed:
+        st.markdown("#### Removed duplicate elements / 제거된 중복 요소")
+        st.write(", ".join(removed))
+    else:
+        st.markdown("✅ No duplicates found / 중복 요소 없음")
