@@ -8,7 +8,7 @@ object_desc = st.text_input("🎯 Object / Subject Description",
 
 combo = st.selectbox("🔑 Visual Combo", ["Freak + Cute", "Odd + Sacred", "Queer + Clinical", "Queer + Myth", "Freak + Soft", "Odd + Narcissism"])
 
-ratio = st.selectbox("📐 Aspect Ratio", ["2:3", "16:9"])
+ratio = st.selectbox("📐 Aspect Ratio", ["1:1", "2:3", "16:9"])
 
 light_type = st.selectbox("💡 Light Type", ["soft flash", "harsh spotlight", "low key light"])
 
