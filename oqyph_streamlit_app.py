@@ -26,13 +26,21 @@ distance_options = [
     "half-body shot", "full-body shot", "long shot", "extreme long shot"
 ]
 
+lens_options = [
+    "16mm 광각 렌즈 (왜곡 강함, 공간감 강조)",
+    "35mm 다큐 렌즈 (자연스러운 광각)",
+    "50mm 표준 렌즈 (사람 눈과 비슷)",
+    "85mm 인물 렌즈 (배경 압축, 부드러움)",
+    "200mm 망원 렌즈 (원근감 약화, 압축)",
+    "fish-eye 렌즈 (극단적 왜곡, 초광각)",
+    "macro 렌즈 (초근접 디테일 강조)"
+]
+
 # 카테고리 선택
 adj_category = st.selectbox("Select adjective category / 형용사 카테고리", ["Odd", "Queer", "Freak"])
 target_category = st.selectbox("Select target category / 대상 카테고리", ["Odd", "Queer", "Freak"])
-background_color = st.selectbox("Select background / 배경 선택", background_options)
-subject_distance = st.selectbox("Select subject distance / 피사체 거리", distance_options)
 
-# 랜덤 요소 생성
+# 랜덤 생성 버튼과 결과
 if st.button("🎲 Generate Random Scenario"):
     if adj_category == "Odd":
         adj = random.choice(odd_adjs)
@@ -51,20 +59,19 @@ if st.button("🎲 Generate Random Scenario"):
     scenario = f"{adj} {target}"
     st.session_state["scenario"] = scenario
 
-# 시나리오 출력 유지
+# 시나리오 출력
 scenario_display = st.session_state.get("scenario", "")
 st.text_area("Generated Scenario / 생성된 시나리오", scenario_display, height=100)
 
-# 추가 요소
-pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
-framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
-angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
-film = st.text_input("Film / lens / lighting / effects", "1970s 1980s film style, 16mm, vintage lens, soft flash")
+# 추가 입력
+background_color = st.selectbox("Select background / 배경 선택", background_options)
+subject_distance = st.selectbox("Select subject distance / 피사체 거리", distance_options)
+lens_choice = st.selectbox("Select lens type / 렌즈 종류", lens_options)
 
-# 프롬프트 생성
+# 프롬프트 생성 (아직 렌즈 적용은 표시만, 프롬프트에 추가도 가능)
 if st.button("✨ Generate Prompt"):
     if scenario_display:
-        prompt = f"{scenario_display}, {pose_desc}, {background_color} background, {subject_distance}, {angle}, {film} --ar {framing}"
+        prompt = f"{scenario_display}, {background_color} background, {subject_distance}, {lens_choice}"
         st.text_area("🎬 Generated Prompt / 생성된 프롬프트", prompt, height=150)
     else:
         st.warning("Please generate a scenario first!")
