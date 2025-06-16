@@ -67,11 +67,18 @@ st.text_area("Generated Scenario / 생성된 시나리오", scenario_display, he
 background_color = st.selectbox("Select background / 배경 선택", background_options)
 subject_distance = st.selectbox("Select subject distance / 피사체 거리", distance_options)
 lens_choice = st.selectbox("Select lens type / 렌즈 종류", lens_options)
+pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm raised, facing left")
+framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
+angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
 
-# 프롬프트 생성 (아직 렌즈 적용은 표시만, 프롬프트에 추가도 가능)
+# 프롬프트 생성
 if st.button("✨ Generate Prompt"):
     if scenario_display:
-        prompt = f"{scenario_display}, {background_color} background, {subject_distance}, {lens_choice}"
+        lens_film = f"{lens_choice}, 1970s 1980s vintage film style"
+        prompt = (
+            f"{scenario_display}, {pose_desc}, {background_color} background, "
+            f"{subject_distance}, {angle}, {lens_film} --ar {framing}"
+        )
         st.text_area("🎬 Generated Prompt / 생성된 프롬프트", prompt, height=150)
     else:
         st.warning("Please generate a scenario first!")
