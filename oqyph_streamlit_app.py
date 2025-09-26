@@ -1,6 +1,8 @@
 import streamlit as st
 import random
+from streamlit_drawable_canvas import st_canvas
 
+st.set_page_config(page_title="OQYPH Prompt Generator", layout="centered")
 st.title("OQYPH Prompt Generator")
 
 # 데이터 풀
@@ -26,15 +28,14 @@ distance_options = [
     "half-body shot", "full-body shot", "long shot", "extreme long shot"
 ]
 
-# 렌즈 선택 (표시용 + 프롬프트용 분리)
 lens_options_display = [
-    "16mm 광각 렌즈 (왜곡 강함, 공간감 강조)",
-    "35mm 다큐 렌즈 (자연스러운 광각)",
-    "50mm 표준 렌즈 (사람 눈과 비슷)",
-    "85mm 인물 렌즈 (배경 압축, 부드러움)",
-    "200mm 망원 렌즈 (원근감 약화, 압축)",
-    "fish-eye 렌즈 (극단적 왜곡, 초광각)",
-    "macro 렌즈 (초근접 디테일 강조)"
+    "🧩 16mm 광각 렌즈 (왜곡 강함, 공간감 강조)",
+    "🦄 35mm 다큐 렌즈 (자연스러운 광각)",
+    "👹 50mm 표준 렌즈 (사람 눈과 비슷)",
+    "🧩 85mm 인물 렌즈 (배경 압축, 부드러움)",
+    "🦄 200mm 망원 렌즈 (원근감 약화, 압축)",
+    "👹 fish-eye 렌즈 (극단적 왜곡, 초광각)",
+    "🧩 macro 렌즈 (초근접 디테일 강조)"
 ]
 lens_options_clean = [
     "16mm lens",
@@ -46,9 +47,12 @@ lens_options_clean = [
     "macro lens"
 ]
 
+# 카테고리별 아이콘
+category_icons = {"Odd": "🧩", "Queer": "🦄", "Freak": "👹"}
+
 # 카테고리 선택
-adj_category = st.selectbox("Select adjective category / 형용사 카테고리", ["Odd", "Queer", "Freak"])
-target_category = st.selectbox("Select target category / 대상 카테고리", ["Odd", "Queer", "Freak"])
+adj_category = st.selectbox("Select adjective category / 형용사 카테고리", ["Odd", "Queer", "Freak"], format_func=lambda x: f"{category_icons[x]} {x}")
+target_category = st.selectbox("Select target category / 대상 카테고리", ["Odd", "Queer", "Freak"], format_func=lambda x: f"{category_icons[x]} {x}")
 
 # 랜덤 생성 버튼과 결과
 if st.button("🎲 Generate Random Scenario"):
@@ -82,13 +86,43 @@ pose_desc = st.text_input("Pose Description / 포즈 및 액션", "standing, arm
 framing = st.selectbox("Framing / 화면 비율", ["1:1", "2:3", "16:9"])
 angle = st.selectbox("Camera Angle / 카메라 앵글", ["front view", "side view", "top view", "back view"])
 
+# 이미지 업로드 및 조명 위치 지정
+st.subheader("조명 위치 지정 (이미지 위 클릭)")
+uploaded_img = st.file_uploader("이미지 업로드 (선택)", type=["png", "jpg", "jpeg"])
+canvas_result = None
+light_positions = []
+
+if uploaded_img:
+    st.image(uploaded_img, caption="업로드된 이미지", use_column_width=True)
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 255, 0, 0.3)",  # 조명 마커 색상
+        stroke_width=3,
+        background_image=uploaded_img,
+        update_streamlit=True,
+        height=400,
+        width=400,
+        drawing_mode="point",
+        point_display_radius=10,
+        key="canvas"
+    )
+    if canvas_result and canvas_result.json_data:
+        light_positions = [
+            (int(obj["left"]), int(obj["top"]))
+            for obj in canvas_result.json_data["objects"]
+            if obj["type"] == "circle"
+        ]
+        st.write(f"지정된 조명 위치: {light_positions}")
+
 # 프롬프트 생성
 if st.button("✨ Generate Prompt"):
     if scenario_display:
         lens_film = f"{lens_clean}, 1970s 1980s vintage film style"
+        light_str = ""
+        if light_positions:
+            light_str = " | " + ", ".join([f"light source at ({x},{y})" for x, y in light_positions])
         prompt = (
             f"{scenario_display}, {pose_desc}, {background_color} background, "
-            f"{subject_distance}, {angle}, {lens_film} --ar {framing}"
+            f"{subject_distance}, {angle}, {lens_film} --ar {framing}{light_str}"
         )
         st.text_area("🎬 Generated Prompt / 생성된 프롬프트", prompt, height=150)
     else:
